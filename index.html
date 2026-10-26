@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lagos GTA — City Life</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b110e;color:#f7f4ec;font-family:Arial,sans-serif}
+header{padding:16px;background:#14231b;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.logo{font-size:26px;font-weight:900;color:#f5b629}
+main{max-width:1100px;margin:auto;padding:12px}
+.layout{display:grid;grid-template-columns:1.5fr 1fr;gap:12px}
+.panel{background:#131c17;border:1px solid #35473a;border-radius:12px;overflow:hidden;margin-bottom:12px}
+.heading,.content{padding:14px}
+.heading{border-bottom:1px solid #35473a}
+h2,h3{margin:5px 0 12px}
+.gold{color:#f5b629}
+button{border:0;border-radius:7px;padding:10px;background:#f5b629;color:#17140c;font-weight:bold;cursor:pointer}
+.secondary,.district,.career,.vip,.activity{background:#26372c;color:white;border:1px solid #465b4b}
+button.active{outline:2px solid #f5b629}
+.toolbar,.stats{display:flex;gap:7px;flex-wrap:wrap;padding:12px}
+#game{display:block;width:100%;height:auto;background:#354638;touch-action:none}
+.stat{flex:1;min-width:75px;background:#1c2921;padding:9px;border-radius:7px}
+.stat small{display:block;color:#a9b9ac}.stat strong{display:block;margin-top:5px}
+.districts,.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.district,.career,.vip,.activity{text-align:left}
+small,.muted{color:#a9b9ac;font-size:12px;line-height:1.5}
+.mission{padding:13px;background:#1c2a21;border-radius:9px}
+#feed{background:#0b120e;padding:12px;border-radius:8px;min-height:55px;font-size:13px;line-height:1.5}
+.chat-log{height:180px;overflow:auto;background:#0b120e;padding:10px;border-radius:8px;font-size:12px;margin-bottom:8px}
+.chatline{margin:0 0 8px;overflow-wrap:anywhere}.chatline b{color:#f5b629}
+form{display:flex;gap:6px}
+input{min-width:0;flex:1;padding:10px;background:#0b120e;border:1px solid #465b4b;border-radius:7px;color:white}
+.mobile{display:none;grid-template-columns:1fr 1fr;gap:8px;padding:12px}
+.dpad{display:grid;grid-template-columns:repeat(3,42px);gap:5px;justify-content:center}
+.dpad button{padding:12px 4px}.dpad [data-key=up]{grid-column:2}
+.dpad [data-key=left]{grid-column:1;grid-row:2}
+.dpad [data-key=down]{grid-column:2;grid-row:2}
+.dpad [data-key=right]{grid-column:3;grid-row:2}
+footer{text-align:center;padding:20px;color:#a9b9ac;font-size:11px}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.mobile{display:grid}main{padding:8px}}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="logo">LAGOS GTA</div><small>CITY LIFE • OPEN WORLD DEMO</small></div>
+  <div>DEMO WALLET <strong class="gold" id="topCash">₦2,500</strong></div>
+</header>
+
+<main>
+<div class="layout">
+<section class="panel">
+  <div class="heading"><small class="gold">YOUR CITY. YOUR STORY.</small><h2 id="districtTitle">LEKKI STREET RUN</h2></div>
+  <canvas id="game" width="800" height="600"></canvas>
+  <div class="toolbar">
+    <button id="topView">TOP-DOWN</button>
+    <button id="chaseView" class="secondary">CHASE CAMERA</button>
+    <button id="reset" class="secondary">RESET RIDE</button>
+    <button id="changeCar" class="secondary">CHANGE CAR</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><small>WALLET</small><strong id="cash" class="gold">₦2,500</strong></div>
+    <div class="stat"><small>SPEED</small><strong id="speed">0 km/h</strong></div>
+    <div class="stat"><small>MISSIONS</small><strong id="missionCount">0 / 3</strong></div>
+    <div class="stat"><small>STREET REP</small><strong id="rep">0</strong></div>
+  </div>
+  <div class="mobile">
+    <div class="dpad">
+      <button data-key="up">▲</button><button data-key="left">◀</button>
+      <button data-key="down">▼</button><button data-key="right">▶</button>
+    </div>
+    <div style="display:grid;gap:8px;align-content:center">
+      <button id="mobileMission">START MISSION</button>
+      <button id="brake" class="secondary">BRAKE</button>
+    </div>
+  </div>
+  <p class="muted" style="padding:0 14px">Keyboard: W/A/S/D or arrow keys. Use the buttons on mobile.</p>
+</section>
+
+<aside class="panel">
+  <div class="heading"><small class="gold">MISSION CONTROL</small><h2>THE STREETS CALL</h2></div>
+  <div class="content">
+    <div class="mission">
+      <small class="gold" id="missionType">DELIVERY RUN</small>
+      <h3 id="missionName">Package to the Mainland</h3>
+      <p class="muted" id="missionDesc">Drive to the gold marker before time runs out.</p>
+      <p class="gold" id="reward">REWARD: ₦1,500</p>
+      <button id="startMission" style="width:100%">ACCEPT MISSION →</button>
+    </div>
+    <h3 style="margin-top:20px">Explore Lagos</h3>
+    <div class="districts">
+      <button class="district active" data-zone="Lekki">🌴 Lekki</button>
+      <button class="district" data-zone="Ikeja">🏙️ Ikeja</button>
+      <button class="district" data-zone="Oshodi">🚐 Oshodi</button>
+      <button class="district" data-zone="Victoria Island">🌃 Victoria Island</button>
+    </div>
+    <h3>City radio / street feed</h3><div id="feed">Omo, welcome to Lagos. Find your first mission!</div>
+  </div>
+</aside>
+</div>
+
+<section class="panel">
+  <div class="heading"><small class="gold">LAGOS AFTER DARK</small><h2>LIVE THE LAGOS LIFESTYLE</h2></div>
+  <div class="content grid">
+    <section>
+      <h3>Choose your occupation</h3>
+      <p class="muted">Build a fictional career, earn demo cash, and grow your reputation.</p>
+      <div class="grid">
+        <button class="career active" data-career="Entrepreneur">💼 Entrepreneur</button>
+        <button class="career" data-career="Music promoter">🎤 Music promoter</button>
+        <button class="career" data-career="Robbery crew">🎭 Fictional heist storyline</button>
+        <button class="career" data-career="Underworld boss">🌆 Underworld storyline</button>
+        <button class="career" data-career="Nightlife host">🌙 Nightlife host</button>
+        <button class="career" data-career="Fashion creator">👗 Fashion creator</button>
+      </div>
+      <p id="careerStatus" class="muted">Current career: Entrepreneur.</p>
+    </section>
+
+    <section>
+      <h3>Talk to the streets</h3>
+      <div id="chatLog" class="chat-log" aria-live="polite">
+        <p class="chatline"><b>MC Tobi:</b> Omo, welcome to Lagos! Where your crew dey tonight?</p>
+        <p class="chatline"><b>Amaka:</b> The Island is buzzing. There's a music event near the waterfront.</p>
+        <p class="chatline"><b>DJ Mainland:</b> Sound check done! Catch me at the club later.</p>
+      </div>
+      <form id="chatForm">
+        <input id="chatInput" maxlength="140" placeholder="Say something to the city…" aria-label="Chat message">
+        <button type="submit">SEND</button>
+      </form>
+      <p class="muted">NPC chat demo: replies are simulated, not live messages from other players.</p>
+    </section>
+
+    <section>
+      <h3>Meet Lagos VIPs</h3>
+      <p class="muted">These are original fictional characters, not real celebrity endorsements.</p>
+      <div class="grid">
+        <button class="vip" data-vip="MC Tobi">🎤 MC Tobi</button>
+        <button class="vip" data-vip="Naya Gold">💎 Naya Gold</button>
+        <button class="vip" data-vip="DJ Mainland">🎧 DJ Mainland</button>
+        <button class="vip" data-vip="Zee Banks">📸 Zee Banks</button>
+        <button class="vip" data-vip="Kola Luxe">🚘 Kola Luxe</button>
+        <button class="vip" data-vip="Aunty Mo">✨ Aunty Mo</button>
+      </div>
+      <p id="vipStatus" class="muted">Choose a VIP to start a conversation.</p>
+    </section>
+
+    <section>
+      <h3>Big Lagos energy</h3>
+      <div class="grid">
+        <button class="activity" data-activity="Nightclub">🪩 Nightclub</button>
+        <button class="activity" data-activity="Concert">🎶 Concert</button>
+        <button class="activity" data-activity="Car meet">🚘 Car meet</button>
+        <button class="activity" data-activity="Beach party">🌴 Beach party</button>
+        <button class="activity" data-activity="Fashion event">👗 Fashion event</button>
+        <button class="activity" data-activity="Business deal">💼 Business deal</button>
+      </div>
+      <p id="activityStatus" class="muted">Choose an activity to add it to your story.</p>
+    </section>
+  </div>
+</section>
+</main>
+
+<footer>Fictional Lagos-inspired game prototype. Demo cash is not real money.</footer>
+
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const canvas=$('game'),ctx=canvas.getContext('2d');
+const W=800,H=600;
+const money=n=>'₦'+Math.floor(n).toLocaleString('en-NG');
+let zone='Lekki',cash=2500,completed=0,rep=0,carIndex=0,camera='top',speed=0;
+let missionActive=false,deadline=0,frame=0,keys={},blocks=[],traffic=[];
+const colors=['#171c1b','#d02e38','#e4e5da','#2d67b2','#d5a52e'];
+const missions=[
+ {type:'DELIVERY RUN',name:'Package to the Mainland',reward:1500},
+ {type:'STREET CHALLENGE',name:'Beat the Traffic',reward:2000},
+ {type:'NIGHT SHIFT',name:'Meet at the Waterfront',reward:2500}
+];
+const player={x:400,y:440,a:-Math.PI/2};
+let target={x:625,y:160};
+const replies=[
+ ['MC Tobi','Omo, the city no dey sleep! Where your crew dey tonight?'],
+ ['Amaka','Try the waterfront event. Good vibes and new connections.'],
+ ['Street Plug','Build your rep with missions, but move smart, boss.'],
+ ['DJ Mainland','Sound check done! Catch me at the club later.'],
+ ['Naya Gold','Dress sharp, move smart, and make your own name.'],
+ ['Kola Luxe','Car meet is loading. Bring your cleanest ride!']
+];
+
+function feed(message){$('feed').textContent=message}
+function addChat(name,message){
+ const p=document.createElement('p');p.className='chatline';
+ const b=document.createElement('b');b.textContent=name+': ';
+ p.appendChild(b);p.appendChild(document.createTextNode(message));
+ $('chatLog').appendChild(p);$('chatLog').scrollTop=$('chatLog').scrollHeight;
+}
+function buildCity(){
+ blocks=[];traffic=[];
+ for(let y=0;y<H;y+=120)for(let x=0;x<W;x+=160){
+  if(Math.random()>.17)blocks.push({x:x+18+Math.random()*18,y:y+18+Math.random()*18,w:65+Math.random()*45,h:42+Math.random()*38,c:['#50604c','#686e5b','#7b745e','#3f594c'][Math.floor(Math.random()*4)]});
+ }
+ for(let i=0;i<18;i++)traffic.push({x:Math.random()*W,y:Math.random()*H,a:Math.random()*Math.PI*2,s:.45+Math.random()*.75,c:['#e6bd39','#d8d9d2','#b4483c','#3d5d80'][i%4]});
+}
+function drawCar(x,y,a,color,scale=1){
+ ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.scale(scale,scale);
+ ctx.fillStyle='#080b09';ctx.fillRect(-16,-11,32,22);ctx.fillStyle=color;ctx.fillRect(-14,-10,28,20);
+ ctx.fillStyle='#a6c6c5';ctx.fillRect(-6,-8,12,16);ctx.fillStyle='#f8e9b5';ctx.fillRect(11,-7,3,4);ctx.fillRect(11,3,3,4);
+ ctx.fillStyle='#a82f2f';ctx.fillRect(-14,-7,2,4);ctx.fillRect(-14,3,2,4);ctx.restore();
+}
+function draw(){
+ frame++;ctx.clearRect(0,0,W,H);ctx.save();
+ if(camera==='chase'){ctx.translate(W/2-player.x,H/2-player.y);ctx.rotate(-player.a-Math.PI/2);ctx.scale(1.1,1.1);ctx.translate(-W/2,-H/2)}
+ ctx.fillStyle=zone==='Victoria Island'?'#2b3934':zone==='Ikeja'?'#344239':zone==='Oshodi'?'#3a4437':'#354638';ctx.fillRect(0,0,W,H);
+ ctx.fillStyle='#26342c';for(let y=0;y<H;y+=120)ctx.fillRect(0,y,W,12);for(let x=0;x<W;x+=160)ctx.fillRect(x,0,12,H);
+ ctx.fillStyle='#62665d';ctx.fillRect(0,265,W,84);ctx.fillRect(350,0,92,H);
+ ctx.fillStyle='#b6b19a';ctx.fillRect(0,306,W,2);ctx.fillRect(394,0,2,H);
+ ctx.strokeStyle='#e7d7a0';ctx.lineWidth=2;ctx.setLineDash([18,18]);ctx.beginPath();
+ ctx.moveTo(0,286);ctx.lineTo(W,286);ctx.moveTo(0,327);ctx.lineTo(W,327);
+ ctx.moveTo(373,0);ctx.lineTo(373,H);ctx.moveTo(419,0);ctx.lineTo(419,H);ctx.stroke();ctx.setLineDash([]);
+ blocks.forEach(b=>{
+  ctx.fillStyle='#00000025';ctx.fillRect(b.x+4,b.y+5,b.w,b.h);
+  ctx.fillStyle=b.c;ctx.fillRect(b.x,b.y,b.w,b.h);ctx.fillStyle='#a9ad8a';
+  for(let x=b.x+8;x<b.x+b.w-4;x+=13)for(let y=b.y+7;y<b.y+b.h-4;y+=12)ctx.fillRect(x,y,5,4);
+ });
+ for(let i=0;i<12;i++){let x=(i*97+34)%780,y=(i*137+30)%580;ctx.fillStyle='#4a3323';ctx.fillRect(x-2,y,4,13);ctx.fillStyle='#6e9a57';for(let j=0;j<5;j++){ctx.beginPath();ctx.ellipse(x+Math.cos(j*1.25)*10,y+Math.sin(j*1.25)*8,10,3,j*.6,0,Math.PI*2);ctx.fill()}}
+ traffic.forEach(t=>{t.x+=Math.cos(t.a)*t.s;t.y+=Math.sin(t.a)*t.s;if(t.x<0)t.x=W;if(t.x>W)t.x=0;if(t.y<0)t.y=H;if(t.y>H)t.y=0;drawCar(t.x,t.y,t.a,t.c,.68)});
+ ctx.save();ctx.translate(target.x,target.y);ctx.globalAlpha=.55+Math.sin(frame*.12)*.2;ctx.fillStyle='#ffcb42';ctx.beginPath();ctx.arc(0,0,27,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;ctx.fillStyle='#191b13';ctx.beginPath();ctx.arc(0,0,9,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffc638';ctx.font='bold 12px Arial';ctx.fillText('₦',-4,4);ctx.restore();
+ drawCar(player.x,player.y,player.a,colors[carIndex],camera==='chase'?1.3:1.12);
+ ctx.fillStyle='#101a14';ctx.fillRect(15,15,125,100);ctx.strokeStyle='#9ba88d';ctx.strokeRect(15,15,125,100);
+ ctx.strokeStyle='#667264';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(20,65);ctx.lineTo(135,65);ctx.moveTo(75,18);ctx.lineTo(75,110);ctx.stroke();
+ ctx.fillStyle='#ffca42';ctx.beginPath();ctx.arc(15+target.x/W*125,15+target.y/H*100,3,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(15+player.x/W*125,15+player.y/H*100,4,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#fff';ctx.font='bold 9px Arial';ctx.fillText(zone.toUpperCase(),149,28);
+ if(missionActive){
+  const dist=Math.hypot(target.x-player.x,target.y-player.y),seconds=Math.max(0,Math.ceil((deadline-Date.now())/1000));
+  $('missionDesc').textContent='Reach the gold marker! Time remaining: '+seconds+' seconds.';
+  if(seconds<=0){missionActive=false;speed=0;feed('Time is up! Accept the mission and try again.');$('missionDesc').textContent='Mission failed. Try again when ready.';updateMission()}
+  else if(dist<32){missionActive=false;const m=missions[Math.min(completed,2)];cash+=m.reward;completed++;rep+=10;
+   $('cash').textContent=money(cash);$('topCash').textContent=money(cash);$('missionCount').textContent=Math.min(completed,3)+' / 3';$('rep').textContent=rep;
+   feed('Mission complete! '+money(m.reward)+' added to your demo wallet. You dey try!');updateMission()}
+ }
+ ctx.restore();$('speed').textContent=Math.round(Math.abs(speed)*45)+' km/h';requestAnimationFrame(draw);
+}
+function updateMission(){
+ const m=missions[Math.min(completed,2)];
+ $('missionType').textContent=completed>=3?'FREE ROAM':m.type;
+ $('missionName').textContent=completed>=3?'Lagos Is Yours':m.name;
+ $('missionDesc').textContent=completed>=3?'Starter missions complete! Explore the city.':'Drive to the gold marker before the timer runs out.';
+ $('reward').textContent=completed>=3?'KEEP EXPLORING':'REWARD: '+money(m.reward);
+ $('startMission').textContent=completed>=3?'FREE ROAM ACTIVE':missionActive?'MISSION IN PROGRESS':'ACCEPT MISSION →';
+ $('mobileMission').textContent=missionActive?'MISSION ACTIVE':'START MISSION';
+}
+function startMission(){
+ if(completed>=3){feed('All starter missions complete. Free roam is yours!');return}
+ if(missionActive){feed('Mission active. Follow the gold marker!');return}
+ missionActive=true;deadline=Date.now()+90000;
+ target={x:70+Math.random()*660,y:70+Math.random()*460};
+ if(Math.hypot(target.x-player.x,target.y-player.y)<180)target.x=target.x<400?650:100;
+ feed('Mission accepted! You have 90 seconds. No dulling!');updateMission();
+}
+function changeZone(z){
+ zone=z;player.x=400;player.y=440;speed=0;target={x:625,y:160};
+ document.querySelectorAll('.district').forEach(b=>b.classList.toggle('active',b.dataset.zone===z));
+ $('districtTitle').textContent=z.toUpperCase()+' STREET RUN';feed('You just rolled into '+z+'. New streets, new energy.');buildCity();
+}
+function step(){
+ if(keys.ArrowUp||keys.w||keys.W)speed=Math.min(3.6,speed+.08);
+ else if(keys.ArrowDown||keys.s||keys.S)speed=Math.max(-1.7,speed-.08);else speed*=.96;
+ if(keys.ArrowLeft||keys.a||keys.A)player.a-=.045*(speed<0?-1:1);
+ if(keys.ArrowRight||keys.d||keys.D)player.a+=.045*(speed<0?-1:1);
+ player.x=Math.max(18,Math.min(W-18,player.x+Math.cos(player.a)*speed));
+ player.y=Math.max(18,Math.min(H-18,player.y+Math.sin(player.a)*speed));
+}
+function setCamera(mode){camera=mode;$('topView').classList.toggle('secondary',mode!=='top');$('chaseView').classList.toggle('secondary',mode!=='chase');feed(mode==='chase'?'Chase camera selected!':'Top-down camera selected.')}
+buildCity();
+window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();keys[e.key]=true});
+window.addEventListener('keyup',e=>keys[e.key]=false);
+window.addEventListener('blur',()=>keys={});
+setInterval(step,16);
+document.querySelectorAll('.district').forEach(b=>b.addEventListener('click',()=>changeZone(b.dataset.zone)));
+$('startMission').addEventListener('click',startMission);$('mobileMission').addEventListener('click',startMission);
+$('topView').addEventListener('click',()=>setCamera('top'));$('chaseView').addEventListener('click',()=>setCamera('chase'));
+$('reset').addEventListener('click',()=>{player.x=400;player.y=440;player.a=-Math.PI/2;speed=0;missionActive=false;deadline=0;feed('Ride reset. Back on the streets!');updateMission()});
+$('changeCar').addEventListener('click',()=>{carIndex=(carIndex+1)%colors.length;feed('New ride selected. Clean motor!')});
+$('brake').addEventListener('click',()=>{speed=0;feed('You hit the brakes. Safe driving, boss.')});
+document.querySelectorAll('.dpad button').forEach(b=>{
+ const key={up:'ArrowUp',down:'ArrowDown',left:'ArrowLeft',right:'ArrowRight'}[b.dataset.key];
+ const down=e=>{e.preventDefault();keys[key]=true},up=e=>{e.preventDefault();keys[key]=false};
+ b.addEventListener('pointerdown',down);b.addEventListener('pointerup',up);b.addEventListener('pointerleave',up);b.addEventListener('pointercancel',up);
+});
+$('chatForm').addEventListener('submit',e=>{
+ e.preventDefault();const input=$('chatInput'),message=input.value.trim();if(!message)return;
+ addChat('You',message);input.value='';const reply=replies[Math.floor(Math.random()*replies.length)];
+ setTimeout(()=>addChat(reply[0],reply[1]),350);
+});
+document.querySelectorAll('[data-career]').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('[data-career]').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+ $('careerStatus').textContent='Current career: '+b.dataset.career+'. Complete missions to grow your fictional reputation.';
+ feed('Career selected: '+b.dataset.career+'. Story path selected.');
+}));
+document.querySelectorAll('[data-vip]').forEach(b=>b.addEventListener('click',()=>{
+ const vip=b.dataset.vip,message='Omo, make we build something legendary. Meet me at the next city event!';
+ $('vipStatus').textContent=vip+' says: “'+message+'”';addChat(vip,message);feed('You connected with '+vip+' at a fictional VIP event.');
+}));
+document.querySelectorAll('[data-activity]').forEach(b=>b.addEventListener('click',()=>{
+ const activity=b.dataset.activity;$('activityStatus').textContent=activity+' added to your plans. Your city story is getting bigger.';
+ feed('New plan: '+activity+'. Invite your crew and explore the city.');
+}));
+updateMission();draw();
+})();
+</script>
+</body>
+</html>
